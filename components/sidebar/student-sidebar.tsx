@@ -1,34 +1,60 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import {
   Home,
   User,
+  FileText,
   BookOpen,
   Award,
-  FileText,
   Bell,
   Settings,
 } from "lucide-react";
 
 export default function StudentSidebar() {
-  const items = [
-    "Inicio",
-    "Mi Perfil",
-    "CV",
-    "Retos",
-    "Certificaciones",
-    "Experiencias",
-    "Notificaciones",
-    "Configuración",
-  ];
+  const router = useRouter();
 
-  const icons = [
-    Home,
-    User,
-    FileText,
-    BookOpen,
-    Award,
-    BookOpen,
-    Bell,
-    Settings,
+  const items = [
+    {
+      name: "Inicio",
+      icon: Home,
+      path: "/",
+    },
+    {
+      name: "Mi Perfil",
+      icon: User,
+      path: "/profile",
+    },
+    {
+      name: "CV",
+      icon: FileText,
+      path: "/cv",
+    },
+    {
+      name: "Retos",
+      icon: BookOpen,
+      path: "/challenges",
+    },
+    {
+      name: "Certificaciones",
+      icon: Award,
+      path: "/certifications",
+    },
+    {
+      name: "Experiencias",
+      icon: BookOpen,
+      path: "/experiences",
+    },
+    {
+      name: "Notificaciones",
+      icon: Bell,
+      path: "/notifications",
+    },
+    {
+      name: "Configuración",
+      icon: Settings,
+      path: "/settings",
+    },
   ];
 
   return (
@@ -38,21 +64,22 @@ export default function StudentSidebar() {
           SkillProof
         </h1>
         <p className="text-slate-500 text-sm">
-          Panel Estudiante
+          Haz que tu talento hable por ti
         </p>
       </div>
 
       <nav className="space-y-3">
-        {items.map((item, i) => {
-          const Icon = icons[i];
+        {items.map((item) => {
+          const Icon = item.icon;
 
           return (
             <button
-              key={item}
+              key={item.name}
+              onClick={() => router.push(item.path)}
               className="w-full flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-700 hover:bg-[#EAF3FF] hover:text-[#0039A6] transition font-medium"
             >
               <Icon size={20} />
-              {item}
+              {item.name}
             </button>
           );
         })}

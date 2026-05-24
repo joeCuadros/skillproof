@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Briefcase,
@@ -7,20 +10,34 @@ import {
 } from "lucide-react";
 
 export default function CompanySidebar() {
-  const items = [
-    "Inicio",
-    "Retos",
-    "Candidatos",
-    "Notificaciones",
-    "Configuración",
-  ];
+  const router = useRouter();
 
-  const icons = [
-    LayoutDashboard,
-    Briefcase,
-    Users,
-    Bell,
-    Settings,
+  const items = [
+    {
+      name: "Inicio",
+      icon: LayoutDashboard,
+      path: "/company",
+    },
+    {
+      name: "Retos",
+      icon: Briefcase,
+      path: "/company/challenges",
+    },
+    {
+      name: "Candidatos",
+      icon: Users,
+      path: "/company/candidates",
+    },
+    {
+      name: "Notificaciones",
+      icon: Bell,
+      path: "/company/notifications",
+    },
+    {
+      name: "Configuración",
+      icon: Settings,
+      path: "/company/settings",
+    },
   ];
 
   return (
@@ -35,16 +52,17 @@ export default function CompanySidebar() {
       </div>
 
       <nav className="space-y-3">
-        {items.map((item, index) => {
-          const Icon = icons[index];
+        {items.map((item) => {
+          const Icon = item.icon;
 
           return (
             <button
-              key={item}
+              key={item.name}
+              onClick={() => router.push(item.path)}
               className="w-full flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-700 hover:bg-[#EAF3FF] hover:text-[#0039A6] transition font-medium"
             >
               <Icon size={20} />
-              {item}
+              {item.name}
             </button>
           );
         })}
