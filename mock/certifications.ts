@@ -22,4 +22,18 @@ export const mockCertifications: Certification[] = [
     verified: false,
     score: 56,
   },
+  {
+    id: "4",
+    title: "Leadership Skills",
+    level: "Avanzado",
+    verified: true,
+    score: 91,
+  },
+  {
+    id: "5",
+    title: "Frontend Fundamentals",
+    level: "Básico",
+    verified: true,
+    score: 78,
+  },
 ];
