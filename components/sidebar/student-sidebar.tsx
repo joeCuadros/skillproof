@@ -18,7 +18,7 @@ export default function StudentSidebar() {
     {
       name: "Inicio",
       icon: Home,
-      path: "/",
+      path: "/dashboard",
     },
     {
       name: "Mi Perfil",

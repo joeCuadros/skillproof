@@ -16,7 +16,7 @@ export default function CompanySidebar() {
     {
       name: "Inicio",
       icon: LayoutDashboard,
-      path: "/company",
+      path: "/dashboard",
     },
     {
       name: "Retos",
