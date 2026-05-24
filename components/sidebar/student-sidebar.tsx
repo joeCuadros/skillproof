@@ -9,6 +9,7 @@ import {
   Award,
   Bell,
   Settings,
+  MessageSquare
 } from "lucide-react";
 
 export default function StudentSidebar() {
@@ -44,6 +45,11 @@ export default function StudentSidebar() {
       name: "Experiencias",
       icon: BookOpen,
       path: "/experiences",
+    },
+    {
+      name: "Feedback",
+      icon: MessageSquare,
+      path: "/feedback",
     },
     {
       name: "Notificaciones",

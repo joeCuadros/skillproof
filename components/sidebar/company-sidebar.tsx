@@ -7,6 +7,7 @@ import {
   Users,
   Bell,
   Settings,
+  MessageSquare
 } from "lucide-react";
 
 export default function CompanySidebar() {
@@ -27,6 +28,11 @@ export default function CompanySidebar() {
       name: "Candidatos",
       icon: Users,
       path: "/company/candidates",
+    },
+    {
+      name: "Feedback",
+      icon: MessageSquare,
+      path: "/company/feedback",
     },
     {
       name: "Notificaciones",
