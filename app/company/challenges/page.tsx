@@ -30,11 +30,14 @@ export default function CompanyChallengesPage() {
   const [formDifficulty, setFormDifficulty] = useState("Intermedio");
   const [formReward, setFormReward] = useState("");
 
+  // Estado para capturar el feedback individual por candidato (ID o índice como llave)
+  const [individualFeedback, setIndividualFeedback] = useState<{ [key: number]: string }>({});
+
   // Mock de candidatos con puntajes automáticos para el Top
   const mockCandidates = [
-    { name: "Carlos Mendoza", score: 96, file: "solucion_arquitectura_final.zip", time: "Hace 2 horas" },
-    { name: "Ana Sofía Torres", score: 89, file: "query_optimization_v2.sql", time: "Hace 5 horas" },
-    { name: "Jean Pierre Claux", score: 78, file: "index_fix_script.py", time: "Hace 1 día" },
+    { id: 101, name: "Carlos Mendoza", score: 96, file: "solucion_arquitectura_final.zip", time: "Hace 2 horas" },
+    { id: 102, name: "Ana Sofía Torres", score: 89, file: "query_optimization_v2.sql", time: "Hace 5 horas" },
+    { id: 103, name: "Jean Pierre Claux", score: 78, file: "index_fix_script.py", time: "Hace 1 día" },
   ];
 
   // Controladores de acciones
@@ -73,6 +76,18 @@ export default function CompanyChallengesPage() {
     if (e.target.files && e.target.files[0]) {
       setFileName(e.target.files[0].name);
     }
+  };
+
+  // Manejador para enviar el feedback de un estudiante específico
+  const handleSendFeedback = (candidateId: number, candidateName: string) => {
+    const text = individualFeedback[candidateId];
+    if (!text || !text.trim()) {
+      alert("Por favor, escribe un comentario antes de enviar.");
+      return;
+    }
+    alert(`Feedback enviado a ${candidateName}: "${text}"`);
+    // Limpiar input de ese usuario
+    setIndividualFeedback(prev => ({ ...prev, [candidateId]: "" }));
   };
 
   return (
@@ -209,7 +224,7 @@ export default function CompanyChallengesPage() {
         </div>
       )}
 
-      {/* ================= MODAL 2: MONITOR DE EVALUACIÓN (TOP CANDIDATOS IA) ================= */}
+      {/* ================= MODAL 2: MONITOR DE EVALUACIÓN (RANKING + COMENTARIO DIRECTO) ================= */}
       {openPostulantsModal && activeChallenge && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
           <div className="bg-white w-full max-w-2xl rounded-3xl shadow-xl border border-[#D6E4FF] flex flex-col animate-scaleUp max-h-[85vh]">
@@ -230,68 +245,88 @@ export default function CompanyChallengesPage() {
             {/* CUERPO DEL RANKING */}
             <div className="p-6 overflow-y-auto space-y-4 flex-1">
               <p className="text-xs font-medium text-slate-500">
-                Los candidatos han sido ordenados de forma automática según la calidad del código, eficiencia lógica y cobertura de requerimientos:
+                Los candidatos han sido ordenados automáticamente según la calidad del código. Puedes enviarles observaciones individuales directamente:
               </p>
               
-              {/* LISTADO DE CANDIDATOS CONFIGURADO COMO TOP */}
-              <div className="space-y-3">
+              {/* LISTADO DE CANDIDATOS */}
+              <div className="space-y-4">
                 {mockCandidates.map((candidate, idx) => (
                   <div 
-                    key={idx} 
-                    className={`p-4 border rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-all ${
+                    key={candidate.id} 
+                    className={`p-4 border rounded-2xl flex flex-col gap-3 transition-all ${
                       idx === 0 
                         ? "bg-[#F0F5FF] border-[#0039A6]/40 shadow-xs" 
                         : "bg-white border-slate-100 hover:bg-slate-50"
                     }`}
                   >
-                    {/* INFO PRINCIPAL CON BADGE DE TOP */}
-                    <div className="flex-1 space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-6 h-6 rounded-lg text-xs font-extrabold flex items-center justify-center shrink-0 ${
-                          idx === 0 ? "bg-[#0039A6] text-white" : "bg-slate-200 text-slate-600"
-                        }`}>
-                          #{idx + 1}
-                        </span>
-                        <h4 className="font-bold text-slate-800 text-sm">{candidate.name}</h4>
+                    {/* INFO Y PUNTUACIÓN */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="flex-1 space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-6 h-6 rounded-lg text-xs font-extrabold flex items-center justify-center shrink-0 ${
+                            idx === 0 ? "bg-[#0039A6] text-white" : "bg-slate-200 text-slate-600"
+                          }`}>
+                            #{idx + 1}
+                          </span>
+                          <h4 className="font-bold text-slate-800 text-sm">{candidate.name}</h4>
+                        </div>
+
+                        <p className="text-[11px] text-slate-400 font-medium">
+                          Archivo: <span className="text-slate-600 underline cursor-pointer">{candidate.file}</span> • {candidate.time}
+                        </p>
                       </div>
 
-                      <p className="text-[11px] text-slate-400 font-medium">
-                        Archivo: <span className="text-slate-600 underline cursor-pointer">{candidate.file}</span> • {candidate.time}
-                      </p>
-
-                      {/* BARRA DE PUNTAGE IA AUTOMÁTICA */}
-                      <div className="space-y-1 pt-0.5">
-                        <div className="flex justify-between items-center text-[10px] font-bold">
-                          <span className="text-slate-400 uppercase tracking-wide">Match de Habilidades</span>
-                          <span className="text-[#0039A6]">{candidate.score}%</span>
-                        </div>
-                        <div className="w-full bg-slate-200/70 h-1.5 rounded-full overflow-hidden">
-                          <div 
-                            className="bg-[#0039A6] h-full rounded-full transition-all" 
-                            style={{ width: `${candidate.score}%` }} 
-                          />
-                        </div>
+                      {/* ACCIONES DE ESTADO */}
+                      <div className="flex gap-2 items-center shrink-0">
+                        <Button 
+                          onClick={handleOpenCertificate} 
+                          size="sm" 
+                          className="bg-[#0039A6] hover:bg-[#002B7A] text-white rounded-xl text-xs gap-1 h-9 font-semibold"
+                        >
+                          <Award className="w-3.5 h-3.5" /> Certificar
+                        </Button>
+                        
+                        <Button 
+                          onClick={() => alert(`Simulación: Conectando con ${candidate.name}.`)} 
+                          size="sm" 
+                          className="bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs gap-1 h-9 font-semibold"
+                        >
+                          <MessagesSquare className="w-3.5 h-3.5" /> Contactar
+                        </Button>
                       </div>
                     </div>
-                    
-                    {/* ACCIONES DEL MONITOR */}
-                    <div className="flex gap-2 items-center shrink-0 self-end sm:self-center">
-                      <Button 
-                        onClick={handleOpenCertificate} 
-                        size="sm" 
-                        className="bg-[#0039A6] hover:bg-[#002B7A] text-white rounded-xl text-xs gap-1 h-9 font-semibold"
+
+                    {/* BARRA DE PROGRESO DE COINCIDENCIA TÉCNICA */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center text-[10px] font-bold">
+                        <span className="text-slate-400 uppercase tracking-wide">Match de Habilidades</span>
+                        <span className="text-[#0039A6]">{candidate.score}%</span>
+                      </div>
+                      <div className="w-full bg-slate-200/70 h-1.5 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-[#0039A6] h-full rounded-full transition-all" 
+                          style={{ width: `${candidate.score}%` }} 
+                        />
+                      </div>
+                    </div>
+
+                    {/* NUEVO INPUT DE FEEDBACK INDIVIDUAL RÁPIDO */}
+                    <div className="flex gap-2 items-center mt-1 pt-2 border-t border-dashed border-slate-100">
+                      <Input
+                        value={individualFeedback[candidate.id] || ""}
+                        onChange={(e) => setIndividualFeedback(prev => ({ ...prev, [candidate.id]: e.target.value }))}
+                        placeholder={`Escribir feedback rápido para ${candidate.name.split(' ')[0]}...`}
+                        className="h-8.5 text-xs bg-slate-50/50 focus-visible:ring-[#0039A6] rounded-lg border-slate-200"
+                      />
+                      <Button
+                        onClick={() => handleSendFeedback(candidate.id, candidate.name)}
+                        size="sm"
+                        className="bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-8.5 px-3 text-xs shrink-0 font-medium flex items-center gap-1"
                       >
-                        <Award className="w-3.5 h-3.5" /> Dar Certificado
-                      </Button>
-                      
-                      <Button 
-                        onClick={() => alert(`Simulación: Conectando con ${candidate.name}.`)} 
-                        size="sm" 
-                        className="bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs gap-1 h-9 font-semibold"
-                      >
-                        <MessagesSquare className="w-3.5 h-3.5" /> Contactar
+                        <Send className="w-3 h-3" /> Enviar
                       </Button>
                     </div>
+
                   </div>
                 ))}
               </div>
@@ -299,14 +334,13 @@ export default function CompanyChallengesPage() {
 
             {/* BOTONES ACCIONES BAJAS */}
             <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2 rounded-b-3xl">
-              <Button onClick={() => { alert("Simulación: Feedback general enviado."); setOpenPostulantsModal(false); }} variant="outline" className="text-xs rounded-xl border-slate-200">Dar Feedback a No Seleccionados</Button>
-              <Button onClick={() => setOpenPostulantsModal(false)} className="bg-slate-800 text-white rounded-xl text-xs px-4">Cerrar Monitor</Button>
+              <Button onClick={() => setOpenPostulantsModal(false)} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl text-xs px-4 h-9">Cerrar Monitor</Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ================= MODAL 3: EMISIÓN DE CERTIFICADO (VISOR / SUBIDA PDF) ================= */}
+      {/* ================= MODAL 3: EMISIÓN DE CERTIFICADO ================= */}
       {openCertificateModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
           <div className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl border border-[#D6E4FF] overflow-hidden flex flex-col h-[75vh] animate-scaleUp">
@@ -361,7 +395,7 @@ export default function CompanyChallengesPage() {
                 </div>
 
                 <Button
-                  onClick={() => { alert("Simulación: ¡Certificado emitido e indexado en el CV Inteligente del estudiante!"); setOpenCertificateModal(false); }}
+                  onClick={() => { alert("Simulación: ¡Certificado emitido e indexado!"); setOpenCertificateModal(false); }}
                   disabled={!fileName}
                   className="w-full bg-[#0039A6] hover:bg-[#002B7A] text-white font-semibold rounded-xl flex items-center justify-center gap-2 text-xs py-4 disabled:opacity-40"
                 >
