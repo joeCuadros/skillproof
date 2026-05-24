@@ -9,7 +9,8 @@ import {
   Award,
   Bell,
   Settings,
-  MessageSquare
+  MessageSquare,
+  LogOut
 } from "lucide-react";
 
 export default function StudentSidebar() {
@@ -60,6 +61,11 @@ export default function StudentSidebar() {
       name: "Configuración",
       icon: Settings,
       path: "/settings",
+    },
+    {
+      name: "Cerrar sesión",
+      icon: LogOut,
+      path: "/",
     },
   ];
 

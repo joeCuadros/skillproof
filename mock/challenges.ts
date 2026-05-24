@@ -10,8 +10,13 @@ export const mockChallenges: Challenge[] = [
     category: "Data Analytics",
     difficulty: "Intermedio",
     reward: "Certificado + entrevista laboral",
+    finalBenefit: "Certificado oficial firmado por el BCP e ingreso directo a su bolsa de trabajo de verano.",
     participants: 45,
     skills: ["Power BI", "Data Analysis", "Excel"],
+    resources: [
+      { name: "Caso_Negocio_BCP.pdf", url: "#" },
+      { name: "Dataset_Financiero_Historico.xlsx", url: "#" }
+    ]
   },
   {
     id: "2",
@@ -22,8 +27,13 @@ export const mockChallenges: Challenge[] = [
     category: "Frontend",
     difficulty: "Básico",
     reward: "Mentoría + experiencia verificada",
+    finalBenefit: "Mentoría 1 a 1 con el líder de diseño de Innovate y un badge verificable en tu perfil.",
     participants: 31,
     skills: ["React", "UI/UX", "Tailwind"],
+    resources: [
+      { name: "Bases_Innovate_Peru.pdf", url: "#" },
+      { name: "Figma_Layout_Estructura.pdf", url: "#" }
+    ]
   },
   {
     id: "3",
@@ -34,8 +44,13 @@ export const mockChallenges: Challenge[] = [
     category: "Full Stack",
     difficulty: "Intermedio",
     reward: "Certificado + evaluación IA",
+    finalBenefit: "Reporte de feedback de código automatizado por IA y validación de horas de desarrollo.",
     participants: 62,
     skills: ["React", "Node.js", "Firebase"],
+    resources: [
+      { name: "Especificaciones_Tecnicas_CRUD.pdf", url: "#" },
+      { name: "Template_Base_Datos.xlsx", url: "#" }
+    ]
   },
   {
     id: "4",
@@ -46,7 +61,12 @@ export const mockChallenges: Challenge[] = [
     category: "Data Science",
     difficulty: "Avanzado",
     reward: "Certificado + acceso a internship",
+    finalBenefit: "Acceso prioritario a la convocatoria de pasantías de DataCorp con remuneración completa.",
     participants: 28,
     skills: ["Python", "Machine Learning", "Pandas"],
+    resources: [
+      { name: "Instrucciones_Modelo_DataCorp.pdf", url: "#" },
+      { name: "Dataset_Ventas_Anuales.xlsx", url: "#" }
+    ]
   },
 ];

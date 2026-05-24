@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { mockChallenges } from "@/mock/challenges";
-import { Trophy, Building2, ArrowRight, X, UploadCloud, Send } from "lucide-react";
+import { Trophy, Building2, ArrowRight, X, UploadCloud, Send, Gift, Wrench, FileSpreadsheet } from "lucide-react";
 
 export default function ChallengesPage() {
   const [openUploadModal, setOpenUploadModal] = useState(false);
@@ -44,9 +44,9 @@ export default function ChallengesPage() {
         {mockChallenges.map((c) => (
           <Card
             key={c.id}
-            className="bg-white border border-[#D6E4FF] rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-[#0039A6]/40 transition-all duration-300 flex flex-col justify-between min-h-[220px] space-y-4"
+            className="bg-white border border-[#D6E4FF] rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-[#0039A6]/40 transition-all duration-300 flex flex-col justify-between min-h-[340px] space-y-5"
           >
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* COMPAÑÍA */}
               <div className="flex items-center gap-1.5 text-[#0039A6] bg-[#EAF3FF] w-fit px-3 py-1 rounded-xl border border-[#D6E4FF]/40">
                 <Building2 className="w-3.5 h-3.5" />
@@ -63,6 +63,24 @@ export default function ChallengesPage() {
                 <p className="text-slate-500 text-sm leading-relaxed line-clamp-3">
                   {c.description}
                 </p>
+              </div>
+
+              {/* NUEVO: HABILIDADES Y BENEFICIOS EN LA TARJETA PRINCIPAL */}
+              <div className="pt-2 space-y-2 border-t border-slate-100">
+                <div className="flex items-start gap-2 text-xs">
+                  <Wrench className="w-4 h-4 text-[#0039A6] shrink-0 mt-0.5" />
+                  <p className="text-slate-600">
+                    <span className="font-bold text-slate-700">Habilidades a ganar:</span>{" "}
+                    {c.skills || "Análisis de Datos, Resolución de Problemas Complejos"}
+                  </p>
+                </div>
+                <div className="flex items-start gap-2 text-xs">
+                  <Gift className="w-4 h-4 text-[#0039A6] shrink-0 mt-0.5" />
+                  <p className="text-slate-600">
+                    <span className="font-bold text-slate-700">Beneficio final:</span>{" "}
+                    {c.finalBenefit || "Certificado oficial e ingreso a proceso de selección exclusivo"}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -102,8 +120,42 @@ export default function ChallengesPage() {
             </div>
 
             {/* CUERPO DEL FORMULARIO */}
-            <div className="p-6 space-y-5 bg-white">
+            <div className="p-6 space-y-5 bg-white max-h-[70vh] overflow-y-auto">
               
+              {/* NUEVO: DOCUMENTOS Y MATERIALES COMPARTIDOS POR LA EMPRESA */}
+              <div className="space-y-2 bg-[#F7FAFF] border border-[#D6E4FF] rounded-2xl p-4">
+                <label className="text-xs font-bold text-[#0039A6] uppercase tracking-wider flex items-center gap-1.5">
+                  <FileSpreadsheet className="w-4 h-4" />
+                  Recursos y documentos de la empresa
+                </label>
+                <p className="text-xs text-slate-500 leading-relaxed mb-2">
+                  Descarga las bases, plantillas Excel o instrucciones provistas para estructurar tu entrega correctamente:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {(activeChallenge.resources && activeChallenge.resources.length > 0) ? (
+                    activeChallenge.resources.map((res: any, idx: number) => (
+                      <a
+                        key={idx}
+                        href={res.url || "#"}
+                        onClick={(e) => e.preventDefault()} // Simulado
+                        className="text-xs font-semibold text-[#0039A6] bg-white border border-[#D6E4FF] hover:bg-[#EAF3FF] px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-xs"
+                      >
+                        📊 {res.name || "Plantilla_Datos.xlsx"}
+                      </a>
+                    ))
+                  ) : (
+                    <>
+                      <a href="#" onClick={(e) => e.preventDefault()} className="text-xs font-semibold text-[#0039A6] bg-white border border-[#D6E4FF] hover:bg-[#EAF3FF] px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-xs">
+                        📊 Caso_Negocio_Bases.pdf
+                      </a>
+                      <a href="#" onClick={(e) => e.preventDefault()} className="text-xs font-semibold text-[#0039A6] bg-white border border-[#D6E4FF] hover:bg-[#EAF3FF] px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-xs">
+                        📈 Dataset_Consolidado.xlsx
+                      </a>
+                    </>
+                  )}
+                </div>
+              </div>
+
               {/* ZONA DE ARRASTRE / DROPZONE SIMULADA */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-[#0039A6] uppercase tracking-wider">

@@ -7,7 +7,8 @@ import {
   Users,
   Bell,
   Settings,
-  MessageSquare
+  MessageSquare,
+  LogOut
 } from "lucide-react";
 
 export default function CompanySidebar() {
@@ -43,6 +44,11 @@ export default function CompanySidebar() {
       name: "Configuración",
       icon: Settings,
       path: "/company/settings",
+    },
+    {
+      name: "Cerrar sesión",
+      icon: LogOut,
+      path: "/",
     },
   ];
 

@@ -6,6 +6,8 @@ export interface Challenge {
   category: string;
   difficulty: "Básico" | "Intermedio" | "Avanzado";
   reward: string;
+  finalBenefit: string;
   participants: number;
   skills: string[];
+  resources?: { name: string; url: string }[];
 }

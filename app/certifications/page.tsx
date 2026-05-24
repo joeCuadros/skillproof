@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { mockCertifications } from "@/mock/certifications";
-import { Award, ShieldCheck, ShieldAlert, X, Eye, FileText, Download, UploadCloud, Send, Plus } from "lucide-react";
+import { mockValidators } from "@/mock/validators"; // Importación de tus validadores
+import { Award, ShieldCheck, ShieldAlert, X, Eye, FileText, Download, UploadCloud, Send, Plus, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function CertificationsPage() {
   const [openModal, setOpenModal] = useState(false);
@@ -19,6 +20,15 @@ export default function CertificationsPage() {
   // Campos para simulación de nuevo certificado
   const [newTitle, setNewTitle] = useState("");
   const [newLevel, setNewLevel] = useState("Básico");
+
+  // NUEVO: Estados para el sistema de evaluación interactiva antes de emitir certificado
+  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: string }>({});
+  const [evaluationPassed, setEvaluationPassed] = useState<boolean | null>(null);
+
+  // Obtener el validador mock de forma dinámica según el nivel elegido (React / Power BI simulado por nivel)
+  const currentValidator = mockValidators.find(
+    (v) => v.level === newLevel || (newLevel === "Básico" && v.id === "1")
+  ) || mockValidators[0];
 
   const handleOpenManageModal = (cert: any) => {
     setActiveCert(cert);
@@ -33,12 +43,32 @@ export default function CertificationsPage() {
     setFileName(null);
     setNewTitle("");
     setNewLevel("Básico");
+    setSelectedAnswers({});
+    setEvaluationPassed(null);
     setOpenModal(true);
   };
 
   const handleSimulateUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFileName(e.target.files[0].name);
+    }
+  };
+
+  // NUEVO: Validador dinámico de respuestas
+  const handleVerifyAnswers = () => {
+    let correctCount = 0;
+    currentValidator.questions.forEach((q, index) => {
+      if (selectedAnswers[index] === q.correctAnswer) {
+        correctCount++;
+      }
+    });
+
+    // Pasa con el 80% o más de respuestas correctas (ej. 4 de 5)
+    if (correctCount >= currentValidator.questions.length * 0.8) {
+      setEvaluationPassed(true);
+    } else {
+      setEvaluationPassed(false);
+      alert(`Evaluación no superada. Respondiste correctamente ${correctCount} de ${currentValidator.questions.length}. Revisa tus opciones.`);
     }
   };
 
@@ -122,7 +152,7 @@ export default function CertificationsPage() {
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
                     {isCreatingNew 
-                      ? "Completa los datos para enviar el nuevo documento a la cola de verificación" 
+                      ? "Completa tus datos y aprueba la evaluación técnica IA integrada para validar tu título." 
                       : `Nivel Actual: ${activeCert?.level} • Récord: ${activeCert?.score}%`
                     }
                   </p>
@@ -139,33 +169,88 @@ export default function CertificationsPage() {
             {/* CUERPO CENTRAL */}
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-white">
               
-              {/* COLUMNA IZQUIERDA: PREVIEW DINÁMICO */}
-              <div className="w-full md:w-1/2 bg-slate-100 p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200">
-                <div className="text-xs font-bold text-[#0039A6] uppercase tracking-wider mb-2">
-                  Vista Previa del Documento
-                </div>
-                
-                <div className="flex-1 flex flex-col items-center justify-center text-center space-y-2">
-                  <FileText className="w-16 h-16 text-slate-400 animate-pulse" />
-                  <p className="text-sm font-semibold text-slate-500 max-w-xs truncate">
-                    {isCreatingNew ? (fileName || "Ningún archivo seleccionado") : `${activeCert?.title}.pdf`}
-                  </p>
-                  <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
-                    {isCreatingNew 
-                      ? "Una vez cargado tu archivo, nuestro motor IA analizará los metadatos visuales del certificado."
-                      : "El documento digital certificado se renderizará automáticamente en producción."
-                    }
-                  </p>
-                </div>
+              {/* COLUMNA IZQUIERDA: PREVIEW DINÁMICO O EVALUACIÓN IA */}
+              <div className="w-full md:w-1/2 bg-slate-100 p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200 overflow-y-auto">
+                {isCreatingNew ? (
+                  /* NUEVO: PANEL DE EVALUACIÓN OBLIGATORIA SI ES NUEVO */
+                  <div className="space-y-4 flex-1 flex flex-col">
+                    <div className="text-xs font-bold text-[#0039A6] uppercase tracking-wider flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4" />
+                      Evaluación Técnica de Validación (Skill: {currentValidator.skill})
+                    </div>
+                    
+                    <div className="flex-1 space-y-4 pr-1">
+                      {currentValidator.questions.map((q, qIdx) => (
+                        <div key={qIdx} className="bg-white p-4 rounded-2xl border border-[#D6E4FF] space-y-2">
+                          <p className="text-xs font-bold text-slate-800">{qIdx + 1}. {q.question}</p>
+                          <div className="grid grid-cols-1 gap-1.5">
+                            {q.alternatives.map((alt, aIdx) => (
+                              <button
+                                key={aIdx}
+                                type="button"
+                                onClick={() => setSelectedAnswers({ ...selectedAnswers, [qIdx]: alt })}
+                                className={`text-left text-xs p-2 rounded-xl border transition-all ${
+                                  selectedAnswers[qIdx] === alt 
+                                    ? "bg-[#EAF3FF] border-[#0039A6] text-[#0039A6] font-semibold" 
+                                    : "border-slate-100 bg-slate-50 text-slate-600 hover:bg-slate-100"
+                                }`}
+                              >
+                                {alt}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
 
-                {!isCreatingNew && (
-                  <Button
-                    onClick={() => alert("Simulación: Descargando certificado original...")}
-                    variant="outline"
-                    className="mt-4 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold"
-                  >
-                    <Download className="w-4 h-4" /> Descargar Certificado Actual
-                  </Button>
+                    {/* Feedback y acción del validador */}
+                    <div className="pt-2">
+                      {evaluationPassed === true && (
+                        <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 text-green-700 text-xs font-semibold rounded-xl mb-2">
+                          <CheckCircle className="w-4 h-4 text-green-600 shrink-0" /> Conocimientos validados con éxito por el motor de IA. Puedes registrar.
+                        </div>
+                      )}
+                      {evaluationPassed === false && (
+                        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-xl mb-2">
+                          <AlertCircle className="w-4 h-4 text-red-600 shrink-0" /> Respuestas incorrectas detectadas. Por favor reevalúa tus conceptos.
+                        </div>
+                      )}
+
+                      <Button
+                        type="button"
+                        onClick={handleVerifyAnswers}
+                        disabled={Object.keys(selectedAnswers).length < currentValidator.questions.length}
+                        className="w-full bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs py-4 font-semibold disabled:opacity-40"
+                      >
+                        Validar mis conocimientos técnicos
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  /* VISTA PREVIA ORIGINAL PARA CERTIFICADOS EXISTENTES */
+                  <>
+                    <div className="text-xs font-bold text-[#0039A6] uppercase tracking-wider mb-2">
+                      Vista Previa del Documento
+                    </div>
+                    
+                    <div className="flex-1 flex flex-col items-center justify-center text-center space-y-2">
+                      <FileText className="w-16 h-16 text-slate-400 animate-pulse" />
+                      <p className="text-sm font-semibold text-slate-500 max-w-xs truncate">
+                        {activeCert?.title}.pdf
+                      </p>
+                      <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
+                        El documento digital certificado se renderizará automáticamente en producción.
+                      </p>
+                    </div>
+
+                    <Button
+                      onClick={() => alert("Simulación: Descargando certificado original...")}
+                      variant="outline"
+                      className="mt-4 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold"
+                    >
+                      <Download className="w-4 h-4" /> Descargar Certificado Actual
+                    </Button>
+                  </>
                 )}
               </div>
 
@@ -198,12 +283,16 @@ export default function CertificationsPage() {
                         <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Nivel de la Credencial</label>
                         <select
                           value={newLevel}
-                          onChange={(e) => setNewLevel(e.target.value)}
+                          onChange={(e) => {
+                            setNewLevel(e.target.value);
+                            setSelectedAnswers({});
+                            setEvaluationPassed(null);
+                          }}
                           className="w-full border border-[#D6E4FF] focus:border-[#0039A6] outline-none rounded-xl p-2.5 text-sm bg-white font-medium text-slate-700 transition-all"
                         >
-                          <option>Básico</option>
-                          <option>Intermedio</option>
-                          <option>Avanzado</option>
+                          <option value="Básico">Básico</option>
+                          <option value="Intermedio">Intermedio</option>
+                          <option value="Avanzado">Avanzado</option>
                         </select>
                       </div>
                     </>
@@ -252,7 +341,7 @@ export default function CertificationsPage() {
                   </div>
                 </div>
 
-                {/* BOTÓN DE ACCIÓN / SUBMIT */}
+                {/* BOTÓN DE ACCIÓN / SUBMIT (Modificado con la validación de evaluaciónPassed) */}
                 <Button
                   onClick={() => {
                     alert(isCreatingNew 
@@ -261,7 +350,7 @@ export default function CertificationsPage() {
                     );
                     setOpenModal(false);
                   }}
-                  disabled={isCreatingNew ? (!newTitle || !fileName) : false}
+                  disabled={isCreatingNew ? (!newTitle || !fileName || !evaluationPassed) : false}
                   className="w-full bg-[#0039A6] hover:bg-[#002B7A] text-white font-semibold rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm py-5 disabled:opacity-40"
                 >
                   <Send className="w-4 h-4" /> 
