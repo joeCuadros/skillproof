@@ -1,0 +1,62 @@
+import {
+  Home,
+  User,
+  BookOpen,
+  Award,
+  FileText,
+  Bell,
+  Settings,
+} from "lucide-react";
+
+export default function StudentSidebar() {
+  const items = [
+    "Inicio",
+    "Mi Perfil",
+    "CV",
+    "Retos",
+    "Certificaciones",
+    "Experiencias",
+    "Notificaciones",
+    "Configuración",
+  ];
+
+  const icons = [
+    Home,
+    User,
+    FileText,
+    BookOpen,
+    Award,
+    BookOpen,
+    Bell,
+    Settings,
+  ];
+
+  return (
+    <aside className="w-72 min-h-screen bg-white border-r border-[#D6E4FF] p-6 shadow-sm">
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold text-[#0039A6]">
+          SkillProof
+        </h1>
+        <p className="text-slate-500 text-sm">
+          Panel Estudiante
+        </p>
+      </div>
+
+      <nav className="space-y-3">
+        {items.map((item, i) => {
+          const Icon = icons[i];
+
+          return (
+            <button
+              key={item}
+              className="w-full flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-700 hover:bg-[#EAF3FF] hover:text-[#0039A6] transition font-medium"
+            >
+              <Icon size={20} />
+              {item}
+            </button>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}
